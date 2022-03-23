@@ -1,0 +1,47 @@
+﻿{
+  "version": "versionAsString",
+  "family": "perf",
+  "type": "energyProbe",
+  "ts": {
+    "classifier": 1234567890,
+    "historian": 1234567890,
+    "iotfilesender": 1234567890,
+    "commuter": 1234567890,
+    "<wtfservice>": 1234567890
+  },
+  "payloadTs": 123456789,
+  "registry": {
+    "customerId": "thisismyfirstcustomerid",
+    "customerName": "thisismyfirstcustomer",
+    "plantId": "thisismyfirstplant"
+  },
+  "machine": {
+    "id": 1,
+    "name": "SIMULA_10000000000000",
+    "graph": "khfodshfskdjhfsoduihiusauifsdhi",
+    "status": {
+      "id": 1,
+      "name": "IsRunning",
+      "operationalModeId": null,
+      "operationalStatusId": null
+    }
+  },
+  "dimensions": {
+    "product": {
+      "id": 123456789,
+      "name": "SIZE 3",
+      "productBatch": null
+    },
+    "system": {
+      "id": 123,
+      "name": "Vacuum 1",
+      "type": "VACUUM"
+    }
+  },
+  "data": {
+    "readTs": "2019-03-22 01:13:43.000",
+    "variableId": 13,
+    "value": 1254,
+    "unit": "Kw"
+  }
+}

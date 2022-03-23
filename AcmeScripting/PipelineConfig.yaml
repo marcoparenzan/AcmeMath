@@ -1,0 +1,10 @@
+﻿Stages:
+    S1:
+        Filter: |
+            Log(payload.type);
+        Aggregate: |
+            Log(payload.version);
+        Transform: |
+            Log($"{payload.machine.id*5}");
+        Enrich: |
+            payload.newinfo = payload.machine.id+33;

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+    <Compile Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+    <Compile Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+    <EmbeddedResource Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+    <EmbeddedResource Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+    <EmbeddedResource Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+    <None Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+    <None Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+    <None Remove="Money.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.Relations.cs.cs\**" />
+  </ItemGroup>
+
+</Project>

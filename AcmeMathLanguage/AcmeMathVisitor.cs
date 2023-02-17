@@ -2,23 +2,22 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using System.Linq.Expressions;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static AcmeMathParser;
 
 namespace AcmeMathLanguage
 {
-    public partial class AcmeMathVisitor<TTarget> : IAcmeMathVisitor<Expression>
+    public partial class AcmeMathVisitor : IAcmeMathVisitor<ExpressionSyntax>
     {
-        TTarget contextInstance;
-        ParameterExpression contextExpression;
+        IdentifierNameSyntax contextExpression;
 
-        public AcmeMathVisitor(TTarget instance)
+        public AcmeMathVisitor()
         {
-            this.contextInstance = instance;
-            this.contextExpression = Expression.Variable(typeof(TTarget), "context");
+            this.contextExpression = SyntaxFactory.IdentifierName("context");
         }
 
-        public Expression Visit(IParseTree tree)
+        public ExpressionSyntax Visit(IParseTree tree)
         {
             if (tree.Payload is AcmeMathParser.LiteralContext literal)
             {
@@ -78,6 +77,10 @@ namespace AcmeMathLanguage
             {
                 return VisitJumpLiteral(jumpLiteral);
             }
+            else if (tree.Payload is AcmeMathParser.UmLiteralContext umLiteral)
+            {
+                return VisitUmLiteral(umLiteral);
+            }
             else if (tree.Payload is AcmeMathParser.LogicAndContext logicAnd)
             {
                 return VisitLogicAnd(logicAnd);
@@ -120,7 +123,7 @@ namespace AcmeMathLanguage
             }
             else if (tree.Payload is CommonToken token)
             {
-                return Expression.Constant(token.Text.Trim('"'));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(token.Text.Trim('"')));  // MEGAFAKE! STRINGCONTENT
             }
             else
             {
@@ -128,27 +131,27 @@ namespace AcmeMathLanguage
             }
         }
 
-        public Expression VisitArgList([NotNull] AcmeMathParser.ArgListContext context)
+        public ExpressionSyntax VisitArgList([NotNull] AcmeMathParser.ArgListContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitAttribute([NotNull] AcmeMathParser.AttributeContext context)
+        public ExpressionSyntax VisitAttribute([NotNull] AcmeMathParser.AttributeContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitBitXor([NotNull] AcmeMathParser.BitXorContext context)
+        public ExpressionSyntax VisitBitXor([NotNull] AcmeMathParser.BitXorContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitBoolean([NotNull] AcmeMathParser.BooleanContext context)
+        public ExpressionSyntax VisitBoolean([NotNull] AcmeMathParser.BooleanContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitCall([NotNull] AcmeMathParser.CallContext context)
+        public ExpressionSyntax VisitCall([NotNull] AcmeMathParser.CallContext context)
         {
             var target = context.GetChild(0);
             if (target.Payload is AcmeMathParser.AlphaContext alpha)
@@ -167,32 +170,35 @@ namespace AcmeMathLanguage
                 throw new NotImplementedException("");
         }
 
-        public Expression VisitChildren(IRuleNode node)
+        public ExpressionSyntax VisitChildren(IRuleNode node)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitComparison([NotNull] AcmeMathParser.ComparisonContext context)
+        public ExpressionSyntax VisitComparison([NotNull] AcmeMathParser.ComparisonContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitErrorNode(IErrorNode node)
+        public ExpressionSyntax VisitErrorNode(IErrorNode node)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitFactor([NotNull] AcmeMathParser.FactorContext context)
+        public ExpressionSyntax VisitFactor([NotNull] AcmeMathParser.FactorContext context)
+        {
+            var a = Visit(context.GetChild(0));
+            var b = Visit(context.GetChild(2));
+            var kind = SyntaxKind.MultiplyExpression;
+            return SyntaxFactory.BinaryExpression(kind, a, b); // map with the context
+        }
+
+        public ExpressionSyntax VisitGetNode([NotNull] AcmeMathParser.GetNodeContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitGetNode([NotNull] AcmeMathParser.GetNodeContext context)
-        {
-            throw new NotImplementedException("");
-        }
-
-        public Expression VisitJumpLiteral([NotNull] AcmeMathParser.JumpLiteralContext context)
+        public ExpressionSyntax VisitJumpLiteral([NotNull] AcmeMathParser.JumpLiteralContext context)
         {
             var target = context.GetChild(0) as LiteralContext;
             if (target != null)
@@ -201,83 +207,92 @@ namespace AcmeMathLanguage
                 throw new NotImplementedException();
         }
 
-        public Expression VisitLiteral([NotNull] AcmeMathParser.LiteralContext context)
+        public ExpressionSyntax VisitUmLiteral([NotNull] AcmeMathParser.UmLiteralContext context)
+        {
+            var umName = context.GetChild(1);
+            var literal = context.GetChild(3) as LiteralContext;
+            var literalExpression = VisitLiteral(literal);
+            return SyntaxFactory.ParseExpression($"{umName}.Parse(\"{literalExpression}\", null)");
+        }
+
+        public ExpressionSyntax VisitLiteral([NotNull] AcmeMathParser.LiteralContext context)
         {
             if (context.STRING() != null)
             {
-                return Expression.Constant(context.STRING().GetText());
+                return SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(context.STRING().GetText().Trim('"')));  // MEGAFAKE! STRINGCONTENT
             }
             else if (context.INTEGER() != null)
             {
-                return Expression.Constant(int.Parse(context.INTEGER().GetText()));
+                //return SyntaxFactory.ParseExpression($"Speed.Parse(\"{context.INTEGER().GetText()}\", null)");
+                return SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(int.Parse(context.INTEGER().GetText())));
             }
             else if (context.FLOAT() != null)
             {
-                return Expression.Constant(float.Parse(context.FLOAT().GetText()));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(float.Parse(context.FLOAT().GetText())));
             }
             else if (context.IDENTIFIER() != null)
             {
-                throw new NotImplementedException();
+                return SyntaxFactory.IdentifierName(context.GetText().Trim('"'));  // MEGAFAKE! STRINGCONTENT
             }
             else
                 throw new NotImplementedException();
 
         }
 
-        public Expression VisitLogicAnd([NotNull] AcmeMathParser.LogicAndContext context)
+        public ExpressionSyntax VisitLogicAnd([NotNull] AcmeMathParser.LogicAndContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitLogicNot([NotNull] AcmeMathParser.LogicNotContext context)
+        public ExpressionSyntax VisitLogicNot([NotNull] AcmeMathParser.LogicNotContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitLogicOr([NotNull] AcmeMathParser.LogicOrContext context)
+        public ExpressionSyntax VisitLogicOr([NotNull] AcmeMathParser.LogicOrContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitMinus([NotNull] AcmeMathParser.MinusContext context)
+        public ExpressionSyntax VisitMinus([NotNull] AcmeMathParser.MinusContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitParenteses([NotNull] AcmeMathParser.ParentesesContext context)
+        public ExpressionSyntax VisitParenteses([NotNull] AcmeMathParser.ParentesesContext context)
         {
             return null;
         }
 
-        public Expression VisitPlus([NotNull] AcmeMathParser.PlusContext context)
+        public ExpressionSyntax VisitPlus([NotNull] AcmeMathParser.PlusContext context)
         {
             var a = Visit(context.GetChild(0));
             var b = Visit(context.GetChild(2));
-            return Expression.Add(a, b);
+            return SyntaxFactory.BinaryExpression(SyntaxKind.AddExpression, a, b);
         }
 
-        public Expression VisitSign([NotNull] AcmeMathParser.SignContext context)
+        public ExpressionSyntax VisitSign([NotNull] AcmeMathParser.SignContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitSubscription([NotNull] AcmeMathParser.SubscriptionContext context)
+        public ExpressionSyntax VisitSubscription([NotNull] AcmeMathParser.SubscriptionContext context)
         {
             throw new NotImplementedException("");
         }
 
-        public Expression VisitTerminal(ITerminalNode node)
+        public ExpressionSyntax VisitTerminal(ITerminalNode node)
         {
             throw new NotImplementedException("");
         }
 
         /// JSON
 
-        public Expression VisitArr([NotNull] ArrContext context)
+        public ExpressionSyntax VisitArr([NotNull] ArrContext context)
         {
             var ctor = typeof(JList).GetConstructors()[1];
 
-            var initializers = new List<Expression>();
+            var initializers = new List<ExpressionSyntax>();
             for (var i = 0; i < context.ChildCount; i++)
             {
                 var child = context.GetChild(i);
@@ -288,10 +303,14 @@ namespace AcmeMathLanguage
                 }
             }
 
-            return Expression.New(ctor, Expression.NewArrayInit(typeof(JItem), initializers.ToArray()));
+            return SyntaxFactory.ArrayCreationExpression(
+                SyntaxFactory.ArrayType(SyntaxFactory.ParseTypeName("JList"))
+            ).WithInitializer(
+                SyntaxFactory.InitializerExpression(SyntaxKind.ArrayInitializerExpression).AddExpressions(initializers.ToArray())
+            );
         }
 
-        public Expression VisitJson([NotNull] JsonContext context)
+        public ExpressionSyntax VisitJson([NotNull] JsonContext context)
         {
             if (context.obj() != null)
             {
@@ -305,40 +324,47 @@ namespace AcmeMathLanguage
                 throw new NotImplementedException();
         }
 
-        public Expression VisitObj([NotNull] ObjContext context)
+        public ExpressionSyntax VisitObj([NotNull] ObjContext context)
         {
-            var ctor = typeof(JNode).GetConstructors()[0];
-            var ctorTuple = typeof(JNodeKV).GetConstructors()[0];
-
-            var initializers = new List<Expression>();
+            var initializers = new List<ExpressionSyntax>();
             for (var i = 0; i < context.ChildCount; i++)
             {
                 var child = context.GetChild(i);
                 if (child is AcmeMathParser.PairContext pair)
                 {
-                    var name = Expression.Constant(pair.GetChild(0).GetText().Trim('"'));
+                    var name = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(pair.GetChild(0).GetText().Trim('"')));
                     var value = Visit(pair.GetChild(2).Payload as AcmeMathParser.ExpressionContext);
 
-                    var vvalue = Expression.New(typeof(JValue).GetConstructor(new Type[] { value.Type }), value);
+                    var vvalue = SyntaxFactory.ObjectCreationExpression(
+                        SyntaxFactory.ParseTypeName(nameof(JNodeKV)) //  ExpressionSyntax.New(typeof(JValue).GetConstructor(new Type[] { value.Type }), value);
+                    ).AddArgumentListArguments(SyntaxFactory.Argument(value))
+                    ;
 
-                    initializers.Add(Expression.New(ctorTuple, name, vvalue));
+                    initializers.Add(vvalue);
                 }
             }
-            return Expression.New(ctor, Expression.NewArrayInit(typeof(JNodeKV), initializers.ToArray()));
+            return SyntaxFactory.ArrayCreationExpression(
+                SyntaxFactory.ArrayType(SyntaxFactory.ParseTypeName(nameof(JNode)))
+            ).WithInitializer(
+                SyntaxFactory.InitializerExpression(SyntaxKind.ArrayInitializerExpression).AddExpressions(initializers.ToArray())
+            );
         }
 
-        public Expression VisitPair([NotNull] PairContext context)
+        public ExpressionSyntax VisitPair([NotNull] PairContext context)
         {
             throw new NotImplementedException();
         }
 
-        public Expression VisitJmespath([NotNull] JmespathContext context)
+        public ExpressionSyntax VisitJmespath([NotNull] JmespathContext context)
         {
             var text = context.STRING().GetText().Trim('\"');
 
-            return Expression.New(
-                typeof(JMSPathQuery).GetConstructor(new Type[] { typeof(string) })
-                , Expression.Constant(text));
+            return SyntaxFactory.ObjectCreationExpression(
+                SyntaxFactory.ParseTypeName(nameof(JMSPathQuery)) // typeof(string)
+            )
+            .AddArgumentListArguments(
+                SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralToken, SyntaxFactory.Literal(text)))
+            );
         }
     }
 }

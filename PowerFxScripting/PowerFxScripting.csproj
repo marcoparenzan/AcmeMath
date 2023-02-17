@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net7.0</TargetFramework>
+	  <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	<ItemGroup>
+
+		<PackageReference Include="Microsoft.PowerFx.Core" Version="0.2.3-preview" />
+		<PackageReference Include="Microsoft.PowerFx.Interpreter" Version="0.2.3-preview" />
+		<PackageReference Include="Microsoft.PowerFx.LanguageServerProtocol" Version="0.2.3-preview" />
+
+	</ItemGroup>
+
+</Project>

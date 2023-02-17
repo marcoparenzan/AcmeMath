@@ -4,7 +4,7 @@ for (var j = 0; j<count; j++)
 {
     var start = DateTime.Now;
     Console.Write($"Elapsed: ");
-    for (FloatValue i = 0.0f; i < 50.0f; i += 1.0f)
+    for (float i = 0.0f; i < 50.0f; i += 1.0f)
     {
         Console.Write($".");
     }

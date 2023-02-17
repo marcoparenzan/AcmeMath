@@ -1,6 +1,0 @@
-﻿Ohm
-Volt
-Ampere
-Watt
-Second
-Joule

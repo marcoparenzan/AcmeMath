@@ -1,0 +1,58 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp","languageName":"C#","aliases":["c#","C#"]},{"name":"mermaid","languageName":"Mermaid","aliases":[]},{"name":"vscode","aliases":["frontend"],"languageName":null},{"name":"sql","languageName":"SQL","aliases":[]},{"name":"acmemath","languageName":null,"aliases":[]}]}}
+
+#!markdown
+
+# The `AcmeMath` language notebook
+
+#!markdown
+
+Delete packages from .nuget cache
+
+#!pwsh
+
+Remove-Item C:\Users\marco\.nuget\packages\GenericMathLib -Recurse -Force -Confirm:$false
+Remove-Item C:\Users\marco\.nuget\packages\AcmeMathLanguage -Recurse -Force -Confirm:$false
+Remove-Item C:\Users\marco\.nuget\packages\AcmeMath.InteractiveExtension -Recurse -Force -Confirm:$false
+
+#!markdown
+
+Build the updated packages
+
+#!pwsh
+
+dotnet pack D:\repos\AcmeMath\GenericMathLib\GenericMathLib.csproj /p:PackageVersion=1.1.0 -o D:\repos\AcmeMath\packages
+dotnet pack D:\repos\AcmeMath\AcmeMathLanguage\AcmeMathLanguage.csproj /p:PackageVersion=1.1.0 -o D:\repos\AcmeMath\packages
+dotnet pack D:\repos\AcmeMath\AcmeMath.InteractiveExtension\AcmeMath.InteractiveExtension.csproj /p:PackageVersion=1.1.0 -o D:\repos\AcmeMath\packages
+
+#!markdown
+
+Include the generated package
+
+#!csharp
+
+#i nuget:D:\repos\AcmeMath\packages
+
+#!markdown
+
+Reference the nuget packages
+
+#!csharp
+
+#r "nuget:GenericMathLib,1.1.0"
+#r "nuget:AcmeMathLanguage,1.1.0"
+#r "nuget:AcmeMath.InteractiveExtension,1.1.0"
+
+#!markdown
+
+The `#!acmemath` is the magic command to invoke AcmeMath kernel (because the support into VSCode require a update to the .NET Interactive package)
+
+#!csharp
+
+#!acmemath
+3*5
+
+#!csharp
+
+#!acmemathelp

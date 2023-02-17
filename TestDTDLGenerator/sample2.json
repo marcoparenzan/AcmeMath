@@ -1,0 +1,9 @@
+{
+  "PowerAmountKW": {},
+  "NominalVoltage": "220",
+  "Efficiency": 0,
+  "EnergyAmountkWh": 400,
+  "PanelStatus": null,
+  "Temperature": 0,
+  "NewValue": "=NominalVoltage * EnergyAmountkWh"
+}

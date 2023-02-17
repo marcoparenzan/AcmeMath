@@ -1,33 +1,46 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq.Expressions;
 
 namespace AcmeMathLanguage
 {
-    public partial class AcmeMathVisitor<TTarget>
+    public partial class AcmeMathVisitor
     {
-        public Expression VisitAlpha([NotNull] AcmeMathParser.AlphaContext context)
+        public ExpressionSyntax VisitAlpha([NotNull] AcmeMathParser.AlphaContext context)
         {
             var name = context.GetChild(0).GetText();
-            var mi = typeof(TTarget).GetMethod(name);
             var arg1 = Visit(context.GetChild(2));
             var arg2 = Visit(context.GetChild(4));
-            return Expression.Call(contextExpression, mi, arg1, arg2);
+            return SyntaxFactory.InvocationExpression(
+                SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, contextExpression, SyntaxFactory.IdentifierName(name))
+            )
+            .AddArgumentListArguments(
+                SyntaxFactory.Argument(arg1),
+                SyntaxFactory.Argument(arg2)
+            );
         }
 
-        public Expression VisitBeta([NotNull] AcmeMathParser.BetaContext context)
+        public ExpressionSyntax VisitBeta([NotNull] AcmeMathParser.BetaContext context)
         {
             var name = context.GetChild(0).GetText();
-            var mi = typeof(TTarget).GetMethod(name);
             var arg1 = Visit(context.GetChild(2));
-            return Expression.Call(contextExpression, mi, arg1);
+            return SyntaxFactory.InvocationExpression(
+                //SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, contextExpression, SyntaxFactory.IdentifierName(name))
+                SyntaxFactory.IdentifierName(name)
+            )
+            .AddArgumentListArguments(
+                SyntaxFactory.Argument(arg1)
+            );
         }
 
-        public Expression VisitGamma([NotNull] AcmeMathParser.GammaContext context)
+        public ExpressionSyntax VisitGamma([NotNull] AcmeMathParser.GammaContext context)
         {
             var name = context.GetChild(0).GetText();
-            var mi = typeof(TTarget).GetMethod(name);
-            return Expression.Call(contextExpression, mi);
+            return SyntaxFactory.InvocationExpression(
+                SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, contextExpression, SyntaxFactory.IdentifierName(name))
+            );
         }
     }
 }

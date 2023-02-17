@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace AcmeMathLanguage
 {
     public static class AcmeMathHelpers
     {
-        public static Expression ExpressionOf(string code)
+        public static ExpressionSyntax ExpressionOf(string code)
         {
             var inputStream = new AntlrInputStream(code);
             var lexer = new AcmeMathLexer(inputStream);
@@ -19,9 +20,7 @@ namespace AcmeMathLanguage
 
             var context = parser.expression();
 
-            var ctx = new AcmeMathContext();
-
-            var visitor = new AcmeMathVisitor<AcmeMathContext>(ctx);
+            var visitor = new AcmeMathVisitor();
             var exp = visitor.Visit(context);
 
             return exp;

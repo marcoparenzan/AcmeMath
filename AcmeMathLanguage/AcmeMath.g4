@@ -7,6 +7,7 @@ expression
 	| arr															# json
 	| '?' STRING													# jmespath
 	| literal														# jumpLiteral
+	| '[' IDENTIFIER ']' literal									# umLiteral
 	| functionCall													# call
 	| '(' expression ')'											# parenteses
 	| expression '[' expression ']'									# subscription

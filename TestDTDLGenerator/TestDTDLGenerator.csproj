@@ -2,24 +2,36 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="sample2.json" />
     <None Remove="Solar Panel v1.1.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Solar Panel v1.1.json">
+    <AdditionalFiles Include="Models\Solar Panel v1.1.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AdditionalFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="sample2.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.DigitalTwins.Parser" Version="3.12.7" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.5.0-2.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="4.5.0-2.final" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AcmeMathLanguage\AcmeMathLanguage.csproj" />
+    <ProjectReference Include="..\GenericMathLib\GenericMathLib.csproj" />
   </ItemGroup>
 
 </Project>

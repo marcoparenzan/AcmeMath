@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <IsPackable>true</IsPackable>
     <PackageDescription>Create a language</PackageDescription>
@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="microsoft.dotnet.interactive" Version="1.0.0-beta.22103.1" />
-    <PackageReference Include="microsoft.dotnet.interactive.csharp" Version="1.0.0-beta.22103.1" />
+    <PackageReference Include="microsoft.dotnet.interactive" Version="1.0.0-beta.23102.2" />
+    <PackageReference Include="microsoft.dotnet.interactive.csharp" Version="1.0.0-beta.23102.2" />
   </ItemGroup>
 
   <ItemGroup>

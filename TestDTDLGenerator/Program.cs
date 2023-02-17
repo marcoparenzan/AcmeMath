@@ -1,54 +1,86 @@
-﻿using Microsoft.Azure.DigitalTwins.Parser;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis;
+﻿using GenericMathLib;
+using solarPanelMonitoring;
+using System.Numerics;
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using TestDTDLGenerator;
 
-var parser = new ModelParser();
-var text = File.ReadAllText("Solar Panel v1.1.json");
-var jsonDoc = JsonDocument.Parse(text);
-var xx = jsonDoc.RootElement.EnumerateArray().Select(xx => xx.ToString()).ToArray();
-var entities = await parser.ParseAsync(xx);
+var sample = new Solar_Panel_v1_1_7k6
+{
+    EnergyAmountkWh = 100,
+    NominalVoltage = 220,
+    PowerAmountKW = 15
+};
 
-var interfaceInfo = entities.Where(xx => xx.Value is DTInterfaceInfo).Select(xx => xx.Value).Cast<DTInterfaceInfo>().ToArray();
-var name = interfaceInfo.Last().Id.Labels.Last();
-var temetryInfos = entities.Where(xx => xx.Value is DTTelemetryInfo).Select(xx => xx.Value).Cast<DTTelemetryInfo>().ToArray();
+FormulaValue xxx = (sample, "=EnergyAmountkWh * NominalVoltage");
 
-var itemClassDecl = SyntaxFactory.ClassDeclaration($"{name}")
-    .WithModifiers(SyntaxFactory.TokenList()
-        .Add(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
-    )
-    .AddMembers(
-        temetryInfos.Select(xx =>
-            SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName(xx.Schema.EntityKind.ToString()), xx.Name)
-            .AddAttributeLists(
-                SyntaxFactory.AttributeList()
-                .AddAttributes(
-                    SyntaxFactory.Attribute(
-                        SyntaxFactory.IdentifierName("DescriptionAttribute")
-                    )
-                    .AddArgumentListArguments(
-                        SyntaxFactory.AttributeArgument(
-                            SyntaxFactory.LiteralExpression(
-                                SyntaxKind.StringLiteralExpression,
-                                SyntaxFactory.Literal(xx.Id.ToString())
-                            )
-                        )
-                    )
-                )
-            )
-            .AddModifiers(
-                SyntaxFactory.Token(SyntaxKind.PublicKeyword)
-            )
-            .AddAccessorListAccessors(
-                SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration).WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)),
-                SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration).WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
-            )
-        ).ToArray()
-    )
-;
+Console.WriteLine(xxx);
 
-Console.WriteLine(itemClassDecl.NormalizeWhitespace());
+
+JsonSerializerOptions genericMathSerializationOptions2 = new()
+{
+    WriteIndented = true,
+    Converters = { 
+        new GenericMathJsonConverter<Voltage>(),
+        new GenericMathJsonConverter<Power>(),
+        new GenericMathJsonConverter<Energy>()
+    }
+};
+
+
+JsonSerializerOptions genericMathSerializationOptions1 = new()
+{
+    WriteIndented = true,
+    Converters = {
+        new GenericMathJsonConverter<Voltage>(),
+        new GenericMathJsonConverter<Power>(),
+        new GenericMathJsonConverter<Energy>()
+    },
+    TypeInfoResolver = new DefaultJsonTypeInfoResolver
+    {
+        Modifiers = { GenericMathSerializationModifier }
+    }
+};
+
+//var sampleJson = JsonSerializer.Serialize(sample, genericMathSerializationOptions2);
+//File.WriteAllText("sample.json", sampleJson);
+//Console.WriteLine(sampleJson);
+
+//var sampleJson = File.ReadAllText("sample.json");
+//var sample1 = JsonSerializer.Deserialize<Solar_Panel_v1_1_7k6>(sampleJson, genericMathSerializationOptions2);
+
+var sample2Json = File.ReadAllText("sample2.json");
+var sample2 = JsonSerializer.Deserialize<Solar_Panel_v1_1_7k6>(sample2Json, genericMathSerializationOptions1);
 
 Console.ReadLine();
+
+
+static void GenericMathSerializationModifier(JsonTypeInfo jsonTypeInfo)
+{
+    if ((jsonTypeInfo.Type == typeof(Voltage)) || (jsonTypeInfo.Type == typeof(Power)) || (jsonTypeInfo.Type == typeof(Energy)))
+    {
+        var valueFieldInfo = jsonTypeInfo.Type.GetField("value", BindingFlags.NonPublic | BindingFlags.Instance);
+        JsonPropertyInfo propertyInfo = jsonTypeInfo.CreateJsonPropertyInfo(valueFieldInfo.FieldType, valueFieldInfo.Name);
+        propertyInfo.Get = obj => valueFieldInfo.GetValue(obj);
+        propertyInfo.Set = (obj, value) => valueFieldInfo.SetValue(obj, value);
+
+        jsonTypeInfo.Properties.Add(propertyInfo);
+    }
+}
+public class GenericMathJsonConverter<T> : JsonConverter<T>
+    where T : INumber<T>
+{
+    public override T Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options) =>
+            T.Parse(reader.GetString()!, null);
+
+    public override void Write(
+        Utf8JsonWriter writer,
+        T value,
+        JsonSerializerOptions options) =>
+            writer.WriteStringValue(value.ToString());
+}
